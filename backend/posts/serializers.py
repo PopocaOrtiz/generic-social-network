@@ -19,7 +19,11 @@ class PostSerializer(serializers.ModelSerializer):
 
     id = serializers.ReadOnlyField()
     author = UserSerializer(read_only=True)
+    url = serializers.HyperlinkedIdentityField(
+        view_name='posts:post-detail',
+        lookup_field='pk',
+    )
 
     class Meta:
         model = models.Post
-        fields = '__all__'
+        fields = ['id', 'author', 'content', 'created_at', 'url']

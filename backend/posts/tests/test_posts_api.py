@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework import status
 from model_bakery import baker
 
@@ -32,7 +32,8 @@ class PublicPostsApiTest(TestCase):
         res = self.client.get(POSTS_URL)
 
         posts = models.Post.objects.all()
-        serializer = serializers.PostSerializer(posts, many=True)
+        request = APIRequestFactory().get(POSTS_URL)
+        serializer = serializers.PostSerializer(posts, many=True, context={'request': request})
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
@@ -65,5 +66,7 @@ class PrivatePostAPITests(TestCase):
         res = self.client.post(POSTS_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        serializer = serializers.PostSerializer(models.Post.objects.get(id=res.json()['id']))
+        
+        request = APIRequestFactory().get(POSTS_URL)
+        serializer = serializers.PostSerializer(models.Post.objects.get(id=res.json()['id']), context={'request': request})
         self.assertEqual(res.data, serializer.data)
