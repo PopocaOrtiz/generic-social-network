@@ -20,3 +20,14 @@ class Post(models.Model):
 
     def __str__(self):
         return f"{self.author.first_name}: {self.content[:100]}"
+
+
+class Comment(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    author: UserType = models.ForeignKey(User, on_delete=models.CASCADE)  # type: ignore
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    content = models.TextField()
+
+    def __str__(self):
+        return f"{self.author.first_name} {self.content}"
