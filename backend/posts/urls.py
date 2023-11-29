@@ -1,3 +1,4 @@
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from . import views
@@ -6,6 +7,7 @@ from . import views
 app_name = 'posts'
 
 router = DefaultRouter()
-router.register('', views.PostViewSet)
+router.register(r'', views.PostViewSet)
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('', include(router.urls)),
