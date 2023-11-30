@@ -1,5 +1,6 @@
 from rest_framework import viewsets, views, status, permissions, mixins
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from . import serializers
 from . import models
@@ -119,3 +120,15 @@ class ReactionViewSet(
             return [permissions.IsAuthenticated()]
         
         return []
+    
+
+@api_view()
+def comment_reactions_view(request, post_uuid, comment_uuid):
+
+    models.Post.objects.get(id=post_uuid)
+    comment = models.Comment.objects.get(id=comment_uuid)
+    
+    if request.method == 'GET':
+        reactions = models.Reaction.objects.filter(comment=comment)
+        serializer = serializers.ReactionSerializer(reactions, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

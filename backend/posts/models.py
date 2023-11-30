@@ -46,7 +46,8 @@ class Reaction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     type = models.CharField(max_length=20, choices=TYPES)
     user: UserType = models.ForeignKey(User, on_delete=models.CASCADE)  # type: ignore
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
