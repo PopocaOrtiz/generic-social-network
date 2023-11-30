@@ -27,3 +27,11 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Post
         fields = ['id', 'author', 'content', 'created_at', 'url']
+
+
+class ReactionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Reaction
+        fields = '__all__'
+        read_only_fields = ['id', 'user']

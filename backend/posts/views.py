@@ -1,4 +1,4 @@
-from rest_framework import viewsets, views, status, permissions
+from rest_framework import viewsets, views, status, permissions, mixins
 from rest_framework.response import Response
 
 from . import serializers
@@ -76,3 +76,46 @@ class CommentViewSet(viewsets.ModelViewSet):
             return [permissions.IsAuthenticated()]
         
         return super().get_permissions()
+    
+
+class ReactionViewSet(
+        mixins.ListModelMixin, 
+        mixins.CreateModelMixin, 
+        mixins.DestroyModelMixin, 
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet,
+    ):
+
+    queryset = models.Reaction.objects.all()
+    serializer_class = serializers.ReactionSerializer
+
+    def list(self, request, post):
+        self.queryset = self.queryset.filter(post=post)
+        return super().list(request)
+
+    def create(self, request, post, *args, **kwargs):
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        reaction: models.Reaction = self.queryset.filter(post__id=post).exists()  # type: ignore
+
+        if not reaction:
+            serializer.save(
+                user=self.request.user,
+                post_id=post
+            )
+
+        reaction: models.Reaction = self.queryset.get(post__id=post)  # type: ignore
+
+        reaction.refresh_from_db()
+        serializer = self.serializer_class(reaction)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def get_permissions(self):
+
+        if self.action == 'create':
+            return [permissions.IsAuthenticated()]
+        
+        return []
