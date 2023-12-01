@@ -125,3 +125,33 @@ class PrivateReactionsAPITests(TestCase):
         res = self.client.delete(build_reaction_detail_url(post.id, res.json()['id']), payload)
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(queryset.count(), 0)
+
+    def test_send_comment_reaction(self):
+
+        post = baker.make(models.Post)
+        comment = models.Comment.objects.create(
+            post=post,
+            author=self.user,
+            content='comment content'
+        )
+
+        queryset = models.Reaction.objects.filter(comment=comment)
+
+        url = build_comment_reactions_url(post.id, comment.id)
+
+        payload = {
+            'type': models.Reaction.TYPES[0][0]
+        }
+
+        res = self.client.post(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(queryset.count(), 1)
+
+        res = self.client.post(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(queryset.count(), 1)
+
+        res = self.client.delete(build_reaction_detail_url(post.id, res.json()['id']), payload)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+        self.assertEqual(queryset.count(), 0)

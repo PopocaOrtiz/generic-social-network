@@ -1,9 +1,13 @@
+from uuid import UUID
+
 from rest_framework import viewsets, views, status, permissions, mixins
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.request import Request
 
 from . import serializers
 from . import models
+from .permissions import PublicGetPermission
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -122,13 +126,38 @@ class ReactionViewSet(
         return []
     
 
-@api_view()
-def comment_reactions_view(request, post_uuid, comment_uuid):
+@api_view(['GET', 'POST', 'DELETE'])
+@permission_classes([PublicGetPermission])
+def comment_reactions_view(request: Request, post_uuid: UUID, comment_uuid: UUID):
 
-    models.Post.objects.get(id=post_uuid)
+    models.Post.objects.get(id=post_uuid)  # just to check is a valid post uuid
     comment = models.Comment.objects.get(id=comment_uuid)
+
+    queryset = models.Reaction.objects.filter(comment=comment)
     
     if request.method == 'GET':
-        reactions = models.Reaction.objects.filter(comment=comment)
-        serializer = serializers.ReactionSerializer(reactions, many=True)
+        serializer = serializers.ReactionSerializer(queryset, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+    
+    if request.method == 'POST':
+        queryset = queryset.filter(user=request.user)
+        if queryset.exists():
+            reaction = queryset.first()
+        else:
+            reaction = models.Reaction.objects.create(
+                type=request.data,
+                user=request.user,
+                comment=comment,
+            )
+
+        serializer = serializers.ReactionSerializer(reaction)
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    if request.method == 'DELETE':
+
+        models.Reaction.objects.filter(user=request.user).delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
