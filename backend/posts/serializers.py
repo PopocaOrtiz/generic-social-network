@@ -8,10 +8,16 @@ class CommentSerializer(serializers.ModelSerializer):
 
     id = serializers.ReadOnlyField()
     author = UserSerializer(read_only=True)
+    comments = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Comment
         fields = '__all__'
+
+    def get_comments(self, obj):
+        comments = models.Comment.objects.filter(comment=obj)
+        serializer = self.__class__(comments, many=True, context=self.context)
+        return serializer.data
 
 
 

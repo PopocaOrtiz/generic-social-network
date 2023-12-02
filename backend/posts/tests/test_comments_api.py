@@ -1,16 +1,37 @@
+from django.urls import reverse
 from django.test import TestCase
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.test import APIClient
-from django.urls import reverse
 from model_bakery import baker
 
 from posts.models import Post, Comment
 from posts.serializers import CommentSerializer
-from users.models import User
 
 
-def build_comments_url(post_id):
+User = get_user_model()
+
+
+def build_posts_comments_url(post_id):
     return reverse('posts:comments', args=[post_id])
+
+
+def build_comment_detail_url(comment_id):
+    return reverse('posts:comment-detail', args=[comment_id])
+
+
+class CommentModelTest(TestCase):
+
+    def test_comment_must_be_assigned(self):
+
+        user = baker.make(User)
+
+        with self.assertRaises(ValidationError):
+            Comment.objects.create(
+                content='comment content',
+                author=user
+            )
 
 
 class PublicCommentsApiTest(TestCase):
@@ -21,19 +42,39 @@ class PublicCommentsApiTest(TestCase):
     def test_get_comments(self):
 
         post = baker.make(Post)  # type: Post
-        post.comments.add(baker.make(Comment))
-        post.comments.add(baker.make(Comment))
+        baker.make(Comment, post=post)
+        baker.make(Comment, post=post)
 
         another_post = baker.make(Post)  # type: Post
-        post.comments.add(baker.make(Comment))
+        baker.make(Comment, post=another_post)
 
-        url = build_comments_url(post.id)
+        url = build_posts_comments_url(post.id)
 
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         
         serializer = CommentSerializer(Comment.objects.filter(post=post), many=True)
         self.assertEquals(res.data, serializer.data)
+
+    def test_get_comment(self):
+        """test a comment can be assigned to another comment"""
+        post = baker.make(Post)
+        post_comment = baker.make(Comment, post=post)
+        post_comment_comment1 = baker.make(Comment, comment=post_comment)
+        post_comment_comment2 = baker.make(Comment, comment=post_comment)
+        post_comment_comment1_comment = baker.make(Comment, comment=post_comment_comment1)
+
+        serializer = CommentSerializer(post_comment)
+
+        url = build_comment_detail_url(post_comment.id)
+        
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+
+        from pprint import pprint
+        pprint(res.json())
 
     def test_create_comment_fail(self):
         
@@ -44,7 +85,7 @@ class PublicCommentsApiTest(TestCase):
             'post': post.id,
         }
 
-        url = build_comments_url(post.id)
+        url = build_posts_comments_url(post.id)
 
         res = self.client.post(url, payload)
 
@@ -67,7 +108,7 @@ class PrivateCommentsApiTest(TestCase):
             'content': 'comment content'
         }
 
-        url = build_comments_url(post.id)
+        url = build_posts_comments_url(post.id)
 
         res = self.client.post(url, payload)
 

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from rest_framework import viewsets, views, status, permissions, mixins
+from rest_framework import viewsets, views, status, permissions, mixins, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
@@ -161,3 +161,7 @@ def comment_reactions_view(request: Request, post_uuid: UUID, comment_uuid: UUID
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     
+class CommentDetailAPIView(generics.RetrieveAPIView):
+
+    queryset = models.Comment.objects.all()
+    serializer_class = serializers.CommentSerializer

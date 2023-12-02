@@ -66,7 +66,6 @@ class PrivatePostAPITests(TestCase):
         res = self.client.post(POSTS_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        
         request = APIRequestFactory().get(POSTS_URL)
         serializer = serializers.PostSerializer(models.Post.objects.get(id=res.json()['id']), context={'request': request})
         self.assertEqual(res.data, serializer.data)
