@@ -128,9 +128,8 @@ class ReactionViewSet(
 
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes([PublicGetPermission])
-def comment_reactions_view(request: Request, post_uuid: UUID, comment_uuid: UUID):
+def comment_reactions_view(request: Request, comment_uuid: UUID):
 
-    models.Post.objects.get(id=post_uuid)  # just to check is a valid post uuid
     comment = models.Comment.objects.get(id=comment_uuid)
 
     queryset = models.Reaction.objects.filter(comment=comment)

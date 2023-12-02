@@ -18,4 +18,6 @@ urlpatterns = [
     path('<uuid:post>/comments/', views.CommentViewSet.as_view({'get': 'list', 'post': 'create'}), name='comments'),
     path('<uuid:post>/reactions/', include(reactions_router.urls)),
     path('comments/<uuid:pk>', views.CommentDetailAPIView.as_view(), name='comment-detail'),
+    # path('comments/<uuid:comment>/comments/', views, name='comment-comments'),
+    path('comments/<uuid:comment_uuid>/reactions/', views.comment_reactions_view, name='comment-reactions'),
 ]

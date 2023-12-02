@@ -17,8 +17,8 @@ def build_reaction_detail_url(post_id, reaction_id):
     return reverse('posts:reaction-detail', args=[post_id, reaction_id])
 
 
-def build_comment_reactions_url(post_id, comment_id):
-    return reverse('posts:comment-reactions', args=[post_id, comment_id])
+def build_comment_reactions_url(comment_id):
+    return reverse('posts:comment-reactions', args=[comment_id])
 
 
 class PublicReactionsAPITest(TestCase):
@@ -69,7 +69,7 @@ class PublicReactionsAPITest(TestCase):
 
         models.Reaction.objects.create(user=user, comment=comment)
 
-        url = build_comment_reactions_url(post.id, comment.id)
+        url = build_comment_reactions_url(comment.id)
         res = self.client.get(url)
 
         self.assertEquals(res.status_code, status.HTTP_200_OK)
@@ -137,7 +137,7 @@ class PrivateReactionsAPITests(TestCase):
 
         queryset = models.Reaction.objects.filter(comment=comment)
 
-        url = build_comment_reactions_url(post.id, comment.id)
+        url = build_comment_reactions_url(comment.id)
 
         payload = {
             'type': models.Reaction.TYPES[0][0]
