@@ -4,8 +4,8 @@ A simple social network built with Django and Django REST Framework
 
 ## Features
 - **Posts**: Users can create, read, update, and delete posts.
-- **Comments**: Users can comment on posts.
-- **Reactions**: Users can react (like, dislike, etc.) to posts.
+- **Comments**: Users can comment on posts and comments.
+- **Reactions**: Users can react (like, dislike, etc.) to posts and comments.
 
 ## Dependencies
 - Python 3.11
