@@ -8,6 +8,7 @@ from rest_framework.request import Request
 from . import serializers
 from . import models
 from .permissions import PublicGetPermission
+from aws.facades.s3 import S3
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -15,8 +16,30 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = models.Post.objects.all()
     serializer_class = serializers.PostSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+
+    def create(self, request):
+
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'image' not in request.data:
+            serializer.save(author=self.request.user)
+        else:
+
+            image = request.data['image']
+            url = S3().upload_inmemory_file(image, "posts-images")
+
+            post = serializer.save(
+                image=url,
+                author=self.request.user
+            )
+
+            serializer.data['image'] = url
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
     def get_permissions(self):
 

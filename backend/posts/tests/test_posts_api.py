@@ -1,6 +1,9 @@
+import os
+
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework import status
 from model_bakery import baker
@@ -69,3 +72,18 @@ class PrivatePostAPITests(TestCase):
         request = APIRequestFactory().get(POSTS_URL)
         serializer = serializers.PostSerializer(models.Post.objects.get(id=res.json()['id']), context={'request': request})
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_post_with_image(self):
+
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/dummy-image.png')
+
+        with open(file_path, 'rb') as file:
+            payload = {
+                'content': 'post content',
+                'image': SimpleUploadedFile('test.png', file.read(), content_type='image/png'),
+            }
+
+            res = self.client.post(POSTS_URL, payload, format='multipart')
+
+            self.assertEquals(res.status_code, status.HTTP_201_CREATED)
+            self.assertIn('image', res.data)

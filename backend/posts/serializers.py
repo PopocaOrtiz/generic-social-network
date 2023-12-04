@@ -32,7 +32,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Post
-        fields = ['id', 'author', 'content', 'created_at', 'url']
+        fields = ['id', 'author', 'content', 'created_at', 'url', 'image']
 
 
 class ReactionSerializer(serializers.ModelSerializer):
