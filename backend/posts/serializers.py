@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from . import models
 from users.serializers import UserSerializer
+from aws.facades.s3 import S3
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -28,10 +29,29 @@ class PostSerializer(serializers.ModelSerializer):
         view_name='posts:post-detail',
         lookup_field='pk',
     )
+    image_file = serializers.ImageField(write_only=True, required=False)
 
     class Meta:
         model = models.Post
-        fields = ['id', 'author', 'content', 'created_at', 'url', 'image']
+        fields = ['id', 'author', 'content', 'created_at', 'url', 'image', 'image_file']
+
+    def create(self, validated_data):
+
+        image_file = validated_data.pop('image_file', None)
+        post = models.Post.objects.create(
+            author=self.context['request'].user,
+            **validated_data
+        )
+
+        if not image_file:
+            return post
+    
+        url = S3().upload_inmemory_file(image_file, "posts-images")
+
+        post.image = url
+        post.save()
+
+        return post
 
 
 class ReactionSerializer(serializers.ModelSerializer):

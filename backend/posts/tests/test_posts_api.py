@@ -1,4 +1,5 @@
 import os
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
@@ -73,17 +74,24 @@ class PrivatePostAPITests(TestCase):
         serializer = serializers.PostSerializer(models.Post.objects.get(id=res.json()['id']), context={'request': request})
         self.assertEqual(res.data, serializer.data)
 
-    def test_create_post_with_image(self):
+    @patch('aws.facades.s3.S3.upload_inmemory_file')
+    def test_create_post_with_image(self, mock_upload_inmemory_field):
+
+        mock_url = 'https://bucket.aws.com/image.png'
+        mock_upload_inmemory_field.return_value = mock_url
 
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/dummy-image.png')
 
         with open(file_path, 'rb') as file:
             payload = {
                 'content': 'post content',
-                'image': SimpleUploadedFile('test.png', file.read(), content_type='image/png'),
+                'image_file': SimpleUploadedFile('test.png', file.read(), content_type='image/png'),
             }
 
             res = self.client.post(POSTS_URL, payload, format='multipart')
 
             self.assertEquals(res.status_code, status.HTTP_201_CREATED)
             self.assertIn('image', res.data)
+            self.assertEqual(res.data['image'], mock_url)
+
+            mock_upload_inmemory_field.assert_called_once()

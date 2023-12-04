@@ -22,7 +22,7 @@ class Base(models.Model):
 
 class Post(Base):
 
-    image = models.ImageField(upload_to='posts-images/', null=True)
+    image = models.URLField(null=True)
     
     class Meta:
         ordering = ['-created_at']
