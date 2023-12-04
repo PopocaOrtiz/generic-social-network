@@ -73,9 +73,6 @@ class PublicCommentsApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
-        from pprint import pprint
-        pprint(res.json())
-
     def test_create_comment_fail(self):
         
         post = baker.make(Post)
