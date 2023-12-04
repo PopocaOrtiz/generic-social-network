@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core import mail
 from rest_framework import status
 from rest_framework.test import APIClient
 from model_bakery import baker
@@ -98,7 +99,7 @@ class PrivateCommentsApiTest(TestCase):
 
     def test_create_comment(self):
 
-        post = baker.make(Post)
+        post = baker.make(Post, author=baker.make(get_user_model()))
 
         payload = {
             'post': post.id,
@@ -112,3 +113,8 @@ class PrivateCommentsApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(res.json()['content'], payload['content'])
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        sent_mail = mail.outbox[0]
+        self.assertEqual(sent_mail.to, [post.author.email])

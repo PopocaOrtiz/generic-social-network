@@ -20,7 +20,6 @@ class CommentSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-
 class PostSerializer(serializers.ModelSerializer):
 
     id = serializers.ReadOnlyField()

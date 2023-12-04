@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Title</title>
+    <style>
+        /* Inline CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333333;
+        }
+        p {
+            color: #666666;
+        }
+        /* Add more styles as needed */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello, {{user_name}}!</h1>
+        <p>Your post:</p>
+        <p>{{post_content}}</p>
+        <p>received a comment:</p>
+        <p>{{comment_content}}</p>
+    </div>
+</body>
+</html>
