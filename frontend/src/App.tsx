@@ -3,9 +3,9 @@ import { Posts } from './features/posts/Posts';
 import './App.css';
 
 function App() {
-  return (
+  return (<>
     <Posts />
-  );
+  </>);
 }
 
 export default App;
