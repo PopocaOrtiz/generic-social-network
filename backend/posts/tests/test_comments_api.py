@@ -55,7 +55,7 @@ class PublicCommentsApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         
         serializer = CommentSerializer(Comment.objects.filter(post=post), many=True)
-        self.assertEquals(res.data, serializer.data)
+        self.assertEqual(res.data, serializer.data)
 
     def test_get_comment(self):
         """test a comment can be assigned to another comment"""

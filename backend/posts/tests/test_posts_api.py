@@ -90,7 +90,7 @@ class PrivatePostAPITests(TestCase):
 
             res = self.client.post(POSTS_URL, payload, format='multipart')
 
-            self.assertEquals(res.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(res.status_code, status.HTTP_201_CREATED)
             self.assertIn('image', res.data)
             self.assertEqual(res.data['image'], mock_url)
 

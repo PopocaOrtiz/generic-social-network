@@ -45,7 +45,7 @@ class PublicReactionsAPITest(TestCase):
         url = build_reactions_url(post.id)
         res = self.client.get(url)
 
-        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         serializer = serializers.ReactionSerializer(models.Reaction.objects.filter(post=post), many=True)
         self.assertEqual(res.data, serializer.data)
@@ -72,7 +72,7 @@ class PublicReactionsAPITest(TestCase):
         url = build_comment_reactions_url(comment.id)
         res = self.client.get(url)
 
-        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         reactions = models.Reaction.objects.filter(comment=comment)
         serializer = serializers.ReactionSerializer(reactions, many=True)

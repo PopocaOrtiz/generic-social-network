@@ -46,5 +46,5 @@ class PubliUserApiTets(TestCase):
 
         res = self.client.post(TOKEN_CREATE_URL, payload)
 
-        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn('token', res.json())
