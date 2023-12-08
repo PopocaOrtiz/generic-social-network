@@ -31,6 +31,7 @@ class User(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     email = models.EmailField(unique=True)
+    image = models.URLField(null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

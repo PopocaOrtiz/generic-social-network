@@ -3,6 +3,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+import pytest
 
 
 USERS_CREATE_URL = reverse('users:create')
@@ -48,3 +49,16 @@ class PubliUserApiTets(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn('token', res.json())
+
+
+@pytest.mark.django_db
+def test_create_user_with_image(api_client, image_file, s3_upload_in_memory_file):
+
+    payload = DEFAULT_USER_DATA.copy()
+    payload['file'] = image_file
+
+    rest = api_client.post(USERS_CREATE_URL, payload, format='multipart')
+
+    assert rest.status_code == status.HTTP_201_CREATED
+
+    assert s3_upload_in_memory_file.called

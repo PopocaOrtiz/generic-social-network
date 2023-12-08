@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from django.utils.translation import gettext as _
 
+from aws.facades.s3 import S3
+
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -12,9 +14,11 @@ class UserSerializer(serializers.ModelSerializer):
         trim_whitespace=False
     )
 
+    file = serializers.ImageField(write_only=True, required=False)
+
     class Meta:
         model = get_user_model()
-        fields = ['email', 'password', 'first_name', 'last_name']
+        fields = ['email', 'password', 'first_name', 'last_name', 'image', 'file']
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -28,6 +32,11 @@ class UserSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
+
+        if file := validated_data.pop('file', None):
+            url = S3().upload_in_memory_file(file, 'users')
+            validated_data['image'] = url
+
         return get_user_model().objects.create_user(**validated_data)
 
 
