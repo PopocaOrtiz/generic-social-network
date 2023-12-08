@@ -74,11 +74,11 @@ class PrivatePostAPITests(TestCase):
         serializer = serializers.PostSerializer(models.Post.objects.get(id=res.json()['id']), context={'request': request})
         self.assertEqual(res.data, serializer.data)
 
-    @patch('aws.facades.s3.S3.upload_inmemory_file')
-    def test_create_post_with_image(self, mock_upload_inmemory_field):
+    @patch('aws.facades.s3.S3.upload_in_memory_file')
+    def test_create_post_with_image(self, mock_upload_in_memory_field):
 
         mock_url = 'https://bucket.aws.com/image.png'
-        mock_upload_inmemory_field.return_value = mock_url
+        mock_upload_in_memory_field.return_value = mock_url
 
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/dummy-image.png')
 
@@ -94,4 +94,4 @@ class PrivatePostAPITests(TestCase):
             self.assertIn('image', res.data)
             self.assertEqual(res.data['image'], mock_url)
 
-            mock_upload_inmemory_field.assert_called_once()
+            mock_upload_in_memory_field.assert_called_once()

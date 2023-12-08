@@ -46,7 +46,7 @@ class PostSerializer(serializers.ModelSerializer):
         if not image_file:
             return post
     
-        url = S3().upload_inmemory_file(image_file, "posts-images")
+        url = S3().upload_in_memory_file(image_file, "posts")
 
         post.image = url
         post.save()

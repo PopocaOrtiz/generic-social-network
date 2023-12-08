@@ -9,7 +9,7 @@ class S3:
         self.client = boto3.client('s3')
         self.bucket_name = 'gsn-01-public'
 
-    def upload_inmemory_file(self, file, folder) -> str:
+    def upload_in_memory_file(self, file, folder) -> str:
         """
         uploads a file that is currently on memory
         """
