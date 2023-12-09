@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, FC } from 'react';
 
 import { IPost } from './types';
+import Post from './post/Post';
+import Search from './../../components/Search';
+import Loading from './../../components/Loading'
 
 const apiHost = process.env.REACT_APP_API_HOST;
 
-export function Posts() {
+const Posts: FC = () => {
 
     const [posts, setPosts] = useState<IPost[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -15,7 +18,7 @@ export function Posts() {
         setLoading(true);
 
         try {
-            const response = await fetch(`${apiHost}/posts/`);
+            const response = await fetch(`${apiHost}posts/`);
 
             if (!response.ok) {
                 throw('error fetching posts');
@@ -25,7 +28,8 @@ export function Posts() {
     
             setPosts(responseData);   
         } catch (error) {
-            throw (error);
+            // throw (error);
+            console.log('error fetching posts', error);
         } finally {
             setLoading(false);
         }
@@ -40,37 +44,15 @@ export function Posts() {
     }
 
     return (<>
-        <section className="navbar-section float-right">
-            <div className="input-group input-inline">
-                <input className="form-input" type="text" placeholder="search" />
-                <button className="btn btn-primary input-group-btn">Search</button>
-            </div>
-        </section>
-        <h1>
-            Posts
-        </h1>
-        {loading && <div className="loading loading-lg"></div>}
+        <h1>Posts</h1>
+        <Search />
+        <Loading show={loading} />
         <div className="columns">
-            <div className="column col-7 col-mx-auto">
-                {posts.map(post => (
-                    <div className="card mb-2 mt-2" key={post.id}>
-                        {post.image && (
-                            <div className="card-image">
-                                <img src={post.image} className="img-responsive" />
-                            </div>
-                        )}
-                        <div className="card-header">
-                            <div className="card-title h5">{post.author.first_name}</div>
-                        </div>
-                        <div className="card-body">
-                            {post.content}
-                        </div>
-                        <div className="card-footer">
-                            <button className="btn btn-primary">react</button>
-                        </div>
-                    </div>
-                ))}
+            <div className="column">
+                {posts.map(post => <Post {...post} key={post.id} />)}
             </div>
         </div>
     </>);
 }
+
+export default Posts;
