@@ -4,6 +4,7 @@ from rest_framework import viewsets, views, status, permissions, mixins, generic
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
+from rest_framework.authentication import TokenAuthentication
 
 from . import serializers
 from . import models
@@ -14,13 +15,14 @@ class PostViewSet(viewsets.ModelViewSet):
 
     queryset = models.Post.objects.all()
     serializer_class = serializers.PostSerializer
+    authentication_classes = [TokenAuthentication]
 
     def get_permissions(self):
 
-        if self.action == 'create':
+        if self.action == 'create' and self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         
-        return super().get_permissions()
+        return [permissions.AllowAny()]
 
 
 class CommentView(views.APIView):
