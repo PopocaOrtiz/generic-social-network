@@ -1,7 +1,9 @@
 import React, { FC, FormEvent, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { login } from '../api';
 import Loading from '../../../components/Loading';
+import FormGroup from '../../../components/FormGroup';
 
 const Login: FC = () => {
 
@@ -12,8 +14,11 @@ const Login: FC = () => {
     const [errorEmail, setErrorEmail] = useState<boolean>(false);
     const [errorPassword, setErrorPassword] = useState<boolean>(false);
     const [loginError, setLoginError] = useState<boolean>(false);
+    const [success, setSuccess] = useState<boolean>(false);
 
-    const handleSubmit = async (event: FormEvent) {
+    const navigate = useNavigate();
+
+    const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
 
         const email = emailRef.current!.value.trim();
@@ -33,40 +38,59 @@ const Login: FC = () => {
 
             setLoading(true);
             const response = await login(email, password);
+            const responseData = await response.json();
 
             if (response.ok) {
+
+                const token = responseData['token'];
+            
+                localStorage.setItem('token', token);
+
+                setSuccess(true);
+    
+                setTimeout(() => {
+                    navigate('/posts');
+                }, 3000);
+
+            } else {
                 setLoginError(true);
-                return;
+                console.log(responseData);
             }
 
-            const data = await response.json();
-            const token = data['token'];
-            
-            localStorage.setItem('token', token);
         } catch(error) {
-            // 
+            setLoginError(true);
             console.log('unexpected error login user', error);
         }
+
+        setLoading(false);
     }
 
     return <>
-        <form onSubmit={handleSubmit}>
-            <p>
-                <label htmlFor="email">e-mail:</label>
-                <input type="text" ref={emailRef}/>
-                {errorEmail && <label>error in the email</label>}
-            </p>
-            <p>
-                <label htmlFor="password">password:</label>
+        <h2>Login</h2>
+        {!success && (
+        <form onSubmit={handleSubmit} className="form-group">
+            <FormGroup error={errorEmail ? 'missing email' : ''}>
+                <label htmlFor="email">Email</label>
+                <input type="email" ref={emailRef}/>
+            </FormGroup>
+            <FormGroup error={errorPassword ? 'missing password' : ''}>
+                <label htmlFor="password">Password</label>
                 <input type="password" ref={passwordRef}/>
-                {errorPassword && <label>error in password</label>}
-            </p>
-            <p>
-                <input type="submit" disabled={loading}/>
+            </FormGroup>
+            <div className="divider"></div>
+            <FormGroup>
+                <input type="submit" disabled={loading} className='float-right'/>
+                <div className="clearfix"></div>
                 <Loading show={loading} />
-                {loginError && <label>incorrect credentials</label>}
-            </p>
+            </FormGroup>
+            {loginError && (<div className="toast toast-error">
+                Login was not successful.
+            </div>)}
         </form>
+        )}
+        {success && (<div className="toast toast-success">
+            Login was successful. Redirecting...
+        </div>)}
     </>;
 }
 

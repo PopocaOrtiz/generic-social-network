@@ -1,8 +1,10 @@
 import React, { useRef, FC, FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { IUser } from '../types';
+import { IUserCreate } from '../types';
 import { registerUser } from '../api';
 import Loading from '../../../components/Loading';
+import FormGroup from '../../../components/FormGroup';
 
 const Register: FC = () => {
 
@@ -13,30 +15,46 @@ const Register: FC = () => {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [success, setSuccess] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
     const [missingFields, setMissingFields] = useState<string[]>([]);
+    const [errors, setErrors] = useState<IUserCreate>({
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: ''
+    });
+
+    const navigate = useNavigate();
+    
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
 
-        const user: IUser = {
+        const user: IUserCreate = {
             first_name: firstNameRef.current!.value.trim(),
             last_name: lastNameRef.current!.value.trim(),
             email: emailRef.current!.value.trim(),
             password: passwordRef.current!.value.trim()
         }
 
-        const missingFields = [];
-        if (!user.first_name.trim()) {
-            missingFields.push('first_name');
+        const errors: any = {}
+
+        if (!user.first_name) {
+            errors['first_name'] = 'missing field';
         }
         if (!user.last_name) {
-            missingFields.push('last_name');
+            errors['last_name'] = 'missing field';
         }
         if (!user.email) {
-            missingFields.push('email');
+            errors['email'] = 'missing field';
         }
         if (!user.password) {
-            missingFields.push('password');
+            errors['password'] = 'missing field';
+        }
+
+        if (Object.keys(errors).length) {
+            setErrors(errors);
+            return;
         }
 
         // todo: check for valid email
@@ -45,60 +63,63 @@ const Register: FC = () => {
         if (missingFields.length) {
             return;
         }
-        
-        console.log(user);
 
         try {
 
             setLoading(true);
             const response = await registerUser(user);
             
-            if (!response.ok) {
-                // todo: display input with errors
+            if (response.ok) {
+                
+                setSuccess(true);
+                setTimeout(() => navigate('/login'), 3000);
+
+            } else {
                 const errors = await response.json();
-                console.log('error registering user', errors);
-                return;
+                setErrors(errors);
             }
 
-            setSuccess(true);
-
         } catch (error) {
-            // todo: display error
-            console.log('error registering user');
+            setError('unexpected error');
+            console.log('unexpected error', error);
         }
 
         setLoading(false);
     }
 
     return <>
-        <h1>Register new user</h1>
-        <form onSubmit={handleSubmit}>
-            <p>
+        <h2>Create an account</h2>
+        {!success && (
+        <form onSubmit={handleSubmit} className="form-group">
+            <FormGroup error={errors.first_name}>
                 <label htmlFor="first_name">First name:</label>
-                <input type="text" ref={firstNameRef}/>
-                {missingFields.indexOf('first_name') && <label>missing first name</label>}
-            </p>
-            <p>
+                <input type="text" ref={firstNameRef} />
+            </FormGroup>
+            <FormGroup error={errors.last_name}>
                 <label htmlFor="lastName">Last name:</label>
                 <input type="text" ref={lastNameRef}/>
-                {missingFields.indexOf('last_name') && <label>missing first name</label>}
-            </p>
-            <p>
-                <label htmlFor="email">e-mail:</label>
-                <input type="email" ref={emailRef}/>
-                {missingFields.indexOf('email') && <label>missing first name</label>}
-            </p>
-            <p>
-                <label htmlFor="password">Password:</label>
-                <input type="password" ref={passwordRef}/>
-                {missingFields.indexOf('password') && <label>missing first name</label>}
-                {/* todo: component to show password complexity */}
-            </p>
-            <p>
-                <input type="submit" disabled={loading}/>
+            </FormGroup>
+            <FormGroup error={errors.email}>
+                <label htmlFor="lastName">e-mail:</label>
+                <input type="text" ref={emailRef}/>
+            </FormGroup>
+            <FormGroup error={errors.password}>
+                <label htmlFor="lastName">Password:</label>
+                <input type="password" ref={passwordRef} pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$"/>
+            </FormGroup>
+            <br />
+            <FormGroup>
+                <input type="submit" disabled={loading} className="float-right"/>
                 <Loading show={loading}/>
-            </p>
+            </FormGroup>
         </form>
+        )}
+        {success && (<div className="toast toast-success">
+            Registration was successful. Redirecting...
+        </div>)}
+        {error && (<div className="toast toast-error">
+            An error occurred.
+        </div>)}
     </>;
 };
 

@@ -18,13 +18,15 @@ describe('posts are rendered', () => {
             content: 'post content',
             image: 'url',
             author: {
-                first_name: 'test'
+                full_name: 'test',
+                email: 'test@mail.com',
+                username: '',
+                image: ''
             }
         };
 
         const assetsFetchMock = () => Promise.resolve({
             ok: true,
-            status: 200,
             json: async () => [post]
         } as Response);
 
