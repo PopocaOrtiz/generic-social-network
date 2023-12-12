@@ -1,27 +1,27 @@
 import React, { useEffect, useState, FC } from 'react';
 
 import { IPost } from './types';
+import { fetchPosts } from './api';
 import Post from './post/Post';
 import Search from './../../components/Search';
 import Loading from './../../components/Loading'
-
-const apiHost = process.env.REACT_APP_API_HOST;
+import PostForm from './post-form/PostForm';
 
 const Posts: FC = () => {
 
     const [posts, setPosts] = useState<IPost[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-
+    const [showPostForm, setShowPostForm] = useState<boolean>(false);
 
     async function getPosts (){
 
         setLoading(true);
 
         try {
-            const response = await fetch(`${apiHost}posts/`);
+            const response = await fetchPosts();
 
             if (!response.ok) {
-                throw('error fetching posts');
+                throw Error('error fetching posts');
             }
     
             const responseData = await response.json();
@@ -39,19 +39,33 @@ const Posts: FC = () => {
         getPosts();
     }, [])
 
-    const clickHandler = () => {
-        getPosts();
+    const postCreateHandler = (post: IPost) => {
+        setPosts(prevPosts => [post, ...prevPosts]);
+        setShowPostForm(false);
     }
 
     return (<>
         <h1>Posts</h1>
-        <Search />
+        <Search>
+            <button onClick={() => setShowPostForm(true)} className="btn input-group-btn">
+                <i className="icon icon-plus mr-2"></i>
+                New post
+            </button>
+        </Search>
+        <br />
         <Loading show={loading} />
-        <div className="columns">
-            <div className="column">
-                {posts.map(post => <Post {...post} key={post.id} />)}
+        {showPostForm && (<>
+            <div className="card">
+                <div className="card-body">
+                    <PostForm onPostCreated={postCreateHandler} />
+                </div>
             </div>
-        </div>
+            <br />
+        </>)}
+        {posts.map(post => (<div key={post.id}>
+            <Post {...post}/>
+            <br />
+        </div>))}
     </>);
 }
 
