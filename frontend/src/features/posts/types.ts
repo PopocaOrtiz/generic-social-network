@@ -1,6 +1,4 @@
-interface IUser {
-    first_name: string;
-}
+import { IUser } from '../users/types';
 
 export interface IPost {
     id: string;
