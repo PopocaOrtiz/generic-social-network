@@ -1,12 +1,14 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
-const Search: FC = () => {
-    return <section className="navbar-section">
-        <div className="input-group input-inline">
-            <input className="form-input" type="text" placeholder="search" />
-            <button className="btn btn-primary input-group-btn">Search</button>
-        </div>
-    </section>;
+const Search: FC<{children: ReactNode}> = ({ children }) => {
+    return <div className="input-group">
+        {children}
+        <input className="form-input" type="text" placeholder="search posts" />
+        <button className="btn btn-primary input-group-btn">
+            <i className="icon icon-search mr-2"></i>
+            Search
+        </button>
+    </div>;
 }
 
 export default Search;
