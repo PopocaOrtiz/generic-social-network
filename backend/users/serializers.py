@@ -15,6 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     file = serializers.ImageField(write_only=True, required=False)
+    full_name = serializers.CharField(read_only=True)
+    username = serializers.CharField(required=False)
 
     class Meta:
         model = get_user_model()

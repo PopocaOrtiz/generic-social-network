@@ -49,7 +49,7 @@ class PublicPostsApiTest(TestCase):
         }
 
         res = self.client.post(POSTS_URL, payload)
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class PrivatePostAPITests(TestCase):
