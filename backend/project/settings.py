@@ -44,6 +44,10 @@ INSTALLED_APPS = [
 
     'users',
     'posts',
+    'chat',
+    'market',
+    'ads',
+    'jobs',
 ]
 
 MIDDLEWARE = [
@@ -144,4 +148,5 @@ EMAIL_FILE_PATH = 'emails'
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'http://localhost:3001',
 ]
