@@ -11,14 +11,6 @@ from users.models import UserType
 
 
 @pytest.fixture
-def api_client():
-
-    client = APIClient()
-
-    yield client
-
-
-@pytest.fixture
 def image_file():
 
     file_path = path.join(path.dirname(path.abspath(__file__)), 'data/image.png')
@@ -46,6 +38,32 @@ def create_user() -> Generator[CreateUserFixture, None, None]:
 
     def create() -> UserType:
         email = fake.email()
-        return get_user_model().objects.create(email=email) # type: ignore
+        username = fake.user_name()
+        return get_user_model().objects.create(email=email, username=username) # type: ignore
     
     yield create
+
+
+@pytest.fixture
+def api_client():
+
+    client = APIClient()
+
+    yield client
+
+
+@pytest.fixture
+def auth_client(create_user: CreateUserFixture):
+    """
+    returns a function that returns an api client and the (forced) authenticated user
+    """
+
+    def get():
+        user = create_user()
+
+        client = APIClient()
+        client.force_authenticate(user)
+
+        return client, user
+
+    yield get
