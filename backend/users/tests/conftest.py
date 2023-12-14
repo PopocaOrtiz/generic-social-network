@@ -1,10 +1,13 @@
 from os import path
+from typing import Callable, Generator, Optional
 
 import pytest
 from rest_framework.test import APIClient
-from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from faker import Faker
+
+from users.models import UserType
 
 
 @pytest.fixture
@@ -31,3 +34,18 @@ def s3_upload_in_memory_file(mocker):
     upload_in_memory_file.return_value = 'https://bucket.aws.com/image.png'
 
     yield upload_in_memory_file
+
+
+CreateUserFixture = Callable[[], UserType]
+
+
+@pytest.fixture
+def create_user() -> Generator[CreateUserFixture, None, None]:
+
+    fake = Faker()
+
+    def create() -> UserType:
+        email = fake.email()
+        return get_user_model().objects.create(email=email) # type: ignore
+    
+    yield create
