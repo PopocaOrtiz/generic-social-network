@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile.backend
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.frontend
+    volumes:
+      - .:/app
+    depends_on:
+      - postgresql
+
+volumes:
+  postgresql_data:
