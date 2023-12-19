@@ -39,7 +39,8 @@ def create_user() -> Generator[CreateUserFixture, None, None]:
     def create() -> UserType:
         email = fake.email()
         username = fake.user_name()
-        return get_user_model().objects.create(email=email, username=username) # type: ignore
+        first_name = fake.first_name()
+        return get_user_model().objects.create(email=email, username=username, first_name=first_name) # type: ignore
     
     yield create
 
