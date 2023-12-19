@@ -1,7 +1,7 @@
 import pytest
 
 from market import models
-from users.tests import conftest
+from backend import conftest
 
 
 @pytest.mark.django_db

@@ -60,7 +60,9 @@ class PublicCommentsApiTest(TestCase):
     def test_get_comment(self):
         """test a comment can be assigned to another comment"""
         post = baker.make(Post)
+
         post_comment = baker.make(Comment, post=post)
+
         post_comment_comment1 = baker.make(Comment, comment=post_comment)
         post_comment_comment2 = baker.make(Comment, comment=post_comment)
         post_comment_comment1_comment = baker.make(Comment, comment=post_comment_comment1)

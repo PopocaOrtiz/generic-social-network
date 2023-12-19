@@ -1,6 +1,7 @@
 import pytest
-from posts.models import Product
 from rest_framework import status
+
+from market.models import Product
 
 
 @pytest.fixture

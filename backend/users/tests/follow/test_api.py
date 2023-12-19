@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from users import models, serializers
-from users.tests import conftest
+from backend import conftest
 
 
 @pytest.mark.xfail
