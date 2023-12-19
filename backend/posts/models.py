@@ -63,3 +63,44 @@ class Reaction(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} {self.type} {self.post.content[:20]}"
+    
+
+class Report(models.Model):
+
+    TYPES = (
+        ('SPAM', 'spam'),
+        ('INAPPROPRIATE', 'inappropriate'),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    type = models.CharField(max_length=20, choices=TYPES)
+    user: UserType = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  # type: ignore
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+
+        if self.post and self.post.author is self.user:
+            raise ValidationError('user cant report own post')
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        if self.post:
+            return f"post {self.post.id} was reported for {self.type}"
+        if self.comment:
+            return f"comment {self.comment.id} was reported for {self.type}"
+        
+        raise ValidationError('report must be assigned to a post or a comment')
+    
+
+class SavedPost(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user: UserType = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  # type: ignore
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"post {self.post.id} was saved"
