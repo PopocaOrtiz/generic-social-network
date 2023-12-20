@@ -17,7 +17,7 @@ def test_report_model(create_post: conftest.CreatePostFixture, create_user: conf
 
     assert str(report) == f"post {post.id} was reported for {report.type}"
 
-    assert post.report_set.count() == 1
+    assert post.reports.count() == 1
 
 
 @pytest.mark.django_db

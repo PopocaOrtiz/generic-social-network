@@ -75,7 +75,7 @@ class Report(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     type = models.CharField(max_length=20, choices=TYPES)
     user: UserType = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  # type: ignore
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name='reports')
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 

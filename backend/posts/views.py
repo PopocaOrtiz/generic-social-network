@@ -163,3 +163,16 @@ class CommentDetailAPIView(generics.RetrieveAPIView):
 
     queryset = models.Comment.objects.all()
     serializer_class = serializers.CommentSerializer
+
+
+class PostReportsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
+
+    serializer_class = serializers.ReportSerializer
+    queryset = models.Report.objects.all()
+
+    def list(self, request, post, *args, **kwargs):
+        self.queryset = self.queryset.filter(post__id=post)
+        return super().list(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, post_id=self.kwargs['post'])

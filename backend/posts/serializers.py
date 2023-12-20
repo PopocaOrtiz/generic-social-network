@@ -60,3 +60,11 @@ class ReactionSerializer(serializers.ModelSerializer):
         model = models.Reaction
         fields = '__all__'
         read_only_fields = ['id', 'user']
+
+    
+class ReportSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Report
+        fields = ['id', 'type', 'comment', 'timestamp']
+        read_only_fields = ['id', 'timestamp']
