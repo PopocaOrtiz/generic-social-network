@@ -2,7 +2,7 @@ from uuid import UUID
 
 from rest_framework import viewsets, views, status, permissions, mixins, generics
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.request import Request
 from rest_framework.authentication import TokenAuthentication
 
@@ -23,6 +23,19 @@ class PostViewSet(viewsets.ModelViewSet):
             return [permissions.IsAuthenticated()]
         
         return [permissions.AllowAny()]
+    
+    @action(detail=True, methods=['POST'])
+    def save(self, request, pk=None):
+        post = self.get_object()
+        models.SavedPost.objects.get_or_create(post=post, user=request.user)
+        return Response(status=status.HTTP_201_CREATED)
+    
+    @action(detail=False, methods=['GET'])
+    def saved(self, request):
+        saved_queryset = models.SavedPost.objects.filter(user=request.user).values('post__id')
+        posts_queryset = self.get_queryset().filter(id__in=saved_queryset)
+        serializer = serializers.PostSerializer(posts_queryset, many=True, context={'request': request})
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class CommentView(views.APIView):
