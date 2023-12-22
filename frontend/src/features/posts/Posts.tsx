@@ -47,13 +47,13 @@ const Posts: FC = () => {
     return (<>
         <h1>Posts</h1>
         <Search>
-            <button onClick={() => setShowPostForm(true)} className="btn input-group-btn">
+            {!showPostForm && <button onClick={() => setShowPostForm(true)} className="btn input-group-btn">
                 <i className="icon icon-plus mr-2"></i>
                 New post
-            </button>
+            </button>}
         </Search>
         <br />
-        <Loading show={loading} />
+        <Loading show={loading} testid="loading-search-posts"/>
         {showPostForm && (<>
             <div className="card">
                 <div className="card-body">

@@ -1,9 +1,11 @@
 import React, { FC } from 'react';
 
-const Loading: FC<{show: boolean}> = ({ show }) => {
+const Loading: FC<{show: boolean}> = ({ show, testid }) => {
 
     if (show) {
-        return <div className="loading loading-lg"></div>;
+        return (<div className="loading loading-lg" 
+          role="progressbar" 
+          data-testid={testid}></div>);
     }
 
     return <></>;
