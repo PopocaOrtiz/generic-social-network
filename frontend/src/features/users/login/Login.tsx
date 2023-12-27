@@ -1,11 +1,18 @@
 import React, { FC, FormEvent, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { login as loginAction } from '../userSlice';
+
+import { useDispatch } from 'react-redux';
+
 import { login } from '../api';
 import Loading from '../../../components/Loading';
 import FormGroup from '../../../components/FormGroup';
 
 const Login: FC = () => {
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
@@ -15,8 +22,6 @@ const Login: FC = () => {
     const [errorPassword, setErrorPassword] = useState<boolean>(false);
     const [loginError, setLoginError] = useState<boolean>(false);
     const [success, setSuccess] = useState<boolean>(false);
-
-    const navigate = useNavigate();
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
@@ -47,6 +52,7 @@ const Login: FC = () => {
                 localStorage.setItem('token', token);
 
                 setSuccess(true);
+                dispatch(loginAction());
     
                 setTimeout(() => {
                     navigate('/posts');
