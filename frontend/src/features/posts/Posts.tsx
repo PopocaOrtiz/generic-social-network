@@ -12,6 +12,7 @@ const Posts: FC = () => {
     const [posts, setPosts] = useState<IPost[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [showPostForm, setShowPostForm] = useState<boolean>(false);
+    const [suggestions, setSuggestions] = useState<Array<string>>([]);
 
     async function getPosts (){
 
@@ -44,9 +45,14 @@ const Posts: FC = () => {
         setShowPostForm(false);
     }
 
+    const changedQuery = (query: string) => {
+        console.log('searching for', query);
+        setSuggestions(current => [...current, query]);
+    }
+
     return (<>
         <h1>Posts</h1>
-        <Search>
+        <Search onChangeQuery={changedQuery} suggestions={suggestions}>
             {!showPostForm && <button onClick={() => setShowPostForm(true)} className="btn input-group-btn">
                 <i className="icon icon-plus mr-2"></i>
                 New post

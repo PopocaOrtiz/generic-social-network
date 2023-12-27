@@ -1,14 +1,45 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FC, ReactNode, useEffect, useState } from 'react';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 
-const Search: FC<{children: ReactNode}> = ({ children }) => {
-    return <div className="input-group">
-        {children}
-        <input className="form-input" type="text" placeholder="search posts" role="textbox"/>
-        <button className="btn btn-primary input-group-btn" role="button" name="search">
-            <i className="icon icon-search mr-2"></i>
-            Search
-        </button>
-    </div>;
+interface ISearchProps {
+    children: React.ReactNode;
+    onChangeQuery: (query: string) => void;
+    suggestions: Array<React.ReactNode>;
+}
+
+const Search: FC<ISearchProps> = ({ children, onChangeQuery, suggestions }) => {
+
+    const [query, setQuery] = useState<string>('');
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onChangeQuery(query);
+        }, 300)
+
+        return () => clearTimeout(timeout);
+    }, [query])
+
+    const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setQuery(event.target.value);
+    }
+
+    return (
+        <>
+            <Autocomplete freeSolo
+                options={suggestions}
+                renderInput={(params) => (
+                    <TextField {...params}
+                        label="search posts"
+                        variant="standard"
+                        margin="normal"
+                        fullWidth
+                        value={query}
+                        onChange={changeHandler}
+                    ></TextField>
+            )}/>
+        </>
+    );
 }
 
 export default Search;
