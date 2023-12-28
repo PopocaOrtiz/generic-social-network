@@ -6,8 +6,9 @@ import { login as loginAction } from '../userSlice';
 import { useDispatch } from 'react-redux';
 
 import { login } from '../api';
-import Loading from '../../../components/Loading';
-import FormGroup from '../../../components/FormGroup';
+
+import { TextField, Typography, Stack, Alert } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const Login: FC = () => {
 
@@ -72,31 +73,36 @@ const Login: FC = () => {
     }
 
     return <>
-        <h2>Login</h2>
+        <Typography variant="h4" textAlign={"center"}>
+            Login
+        </Typography>
         {!success && (
-        <form onSubmit={handleSubmit} className="form-group">
-            <FormGroup error={errorEmail ? 'missing email' : ''}>
-                <label htmlFor="email">Email</label>
-                <input type="email" ref={emailRef}/>
-            </FormGroup>
-            <FormGroup error={errorPassword ? 'missing password' : ''}>
-                <label htmlFor="password">Password</label>
-                <input type="password" ref={passwordRef}/>
-            </FormGroup>
-            <div className="divider"></div>
-            <FormGroup>
-                <input type="submit" disabled={loading} className='float-right'/>
-                <div className="clearfix"></div>
-                <Loading show={loading} />
-            </FormGroup>
-            {loginError && (<div className="toast toast-error">
-                Login was not successful.
-            </div>)}
+        <form onSubmit={handleSubmit} noValidate autoComplete="off">
+            <Stack spacing={2}>
+                <TextField label="Email" 
+                    inputRef={emailRef} 
+                    error={errorEmail} 
+                    helperText={errorEmail ? 'missing email' : ''} />
+                <TextField label="Password"
+                    type='password'
+                    inputRef={passwordRef}
+                    error={errorPassword}
+                    helperText={errorPassword ? 'missing password' : ''} />
+                <LoadingButton variant='contained'
+                    onClick={handleSubmit}
+                    loading={loading}   
+                    disabled={loading}>
+                    Submit
+                </LoadingButton>
+                {loginError && (<div className="toast toast-error">
+                    Login was not successful.
+                </div>)}
+            </Stack>
         </form>
         )}
-        {success && (<div className="toast toast-success">
+        {success && (<Alert severity="success">
             Login was successful. Redirecting...
-        </div>)}
+        </Alert>)}
     </>;
 }
 

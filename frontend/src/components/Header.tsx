@@ -1,6 +1,11 @@
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+
 import { useSelector } from 'react-redux';
 
 export default function Header () {
@@ -11,26 +16,39 @@ export default function Header () {
 
     let userButtons: JSX.Element;
     if (loginStatus == 'logout') {
-        userButtons = (
-            <section className="navbar-section">
-                <Link to="login" className="btn btn-link">Login</Link>
-                <div className="divider-vert" data-content="OR"></div>
-                <Link to="sign-up" className="btn btn-link">Sign Up</Link>
-            </section>
-        );
+        userButtons = (<>
+            <Link to="login">
+                <Button>
+                    Login
+                </Button>
+            </Link>
+            <Link to="sign-up">
+                <Button>
+                    Sign Up
+                </Button>
+            </Link>
+        </>);
     } else {
         userButtons = (
-            <section className="navbar-section">
-                <Link to="me" className="btn btn-link">logout</Link>
-            </section>
+            <Link to="me">
+                <Button>logout</Button>
+            </Link>
         );
     }
 
-    return createPortal(<>
-        <section className="navbar-section">
-            <a href="/" className="navbar-brand mr-2">GSN</a>
-            <Link to="posts" className="btn btn-link">Posts</Link>
-        </section>
-        {userButtons}
-    </>, document.getElementById('header')!);
+    return createPortal(
+        <AppBar>
+            <Toolbar>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    GSN
+                </Typography>
+                <Link to="posts">
+                    <Button>
+                        Posts
+                    </Button>
+                </Link>
+                {userButtons}
+            </Toolbar>
+        </AppBar>
+    , document.getElementById('header')!);
 }
