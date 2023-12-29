@@ -1,40 +1,48 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
 
 import Posts from './Posts';
+import * as api from './api';
 
 describe('<Posts />', () => {
-  test('renders Posts component', () => {
+  test('renders Posts component', async () => {
 
     render(<Posts />);
 
-    const h1Element = screen.getByText(/Posts/i);
-    const buttonElement = screen.getByText(/New post/i);
-    const loading = screen.getByRole("progressbar");
+    const heading = screen.getByRole('heading');
+    expect(heading).toBeInTheDocument();
 
-    expect(h1Element).toBeInTheDocument();
-    expect(buttonElement).toBeInTheDocument();
+    const addButton = screen.getByLabelText('add-post');
+    expect(addButton).toBeInTheDocument();
+
+    const loading = screen.getByRole("progressbar");
     expect(loading).toBeInTheDocument();
+
+    const errorMessage = await screen.findByText(/error fetching posts/);
+
+    expect(errorMessage).toBeInTheDocument();
   });
 
-  test('shows the new post form', () => {
+  test('shows the new post form', async () => {
     render(<Posts />);
-    const buttonElement = screen.getByText(/New post/i);
-    fireEvent.click(buttonElement);
+    const addButton = screen.getByLabelText('add-post');
+    fireEvent.click(addButton);
 
-    const formElement = screen.getByText(/New post/i);
+    const formElement = await screen.findByRole('heading', {level: 5});
     expect(formElement).toBeInTheDocument();
   });
 
-  test('searches posts', () => {
+  test('searches posts', async () => {
+
     const { findByTestId } = render(<Posts />);
+    const inputElement = await findByTestId('search-posts-input');
 
-    const inputElement = screen.getByRole("textbox");
-    const buttonElement = screen.getByRole("button", {name: /search/i});
+    api.fetchPosts = jest.fn(() => Promise.resolve([]));
 
-    fireEvent.change(inputElement, {target: {value: "Hello"}});
-    fireEvent.click(buttonElement);
+    fireEvent.change(inputElement, { target: { value: 'test'}});
 
-    const loading = getByTestId("loadin-search-posts"); 
-    expect(loading).toBeInTheDocument();
+    await waitForElementToBeRemoved(screen.getByRole('progressbar'));
+
+    expect(api.fetchPosts).toHaveBeenCalledWith('test');
+
   });
 });

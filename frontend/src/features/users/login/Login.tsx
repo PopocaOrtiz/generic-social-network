@@ -82,16 +82,19 @@ const Login: FC = () => {
                 <TextField label="Email" 
                     inputRef={emailRef} 
                     error={errorEmail} 
-                    helperText={errorEmail ? 'missing email' : ''} />
+                    helperText={errorEmail ? 'missing email' : ''} 
+                    inputProps={{ 'data-testid': 'email-input' }}/>
                 <TextField label="Password"
                     type='password'
                     inputRef={passwordRef}
                     error={errorPassword}
-                    helperText={errorPassword ? 'missing password' : ''} />
+                    helperText={errorPassword ? 'missing password' : ''} 
+                    inputProps={{ 'data-testid': 'password-input' }} />
                 <LoadingButton variant='contained'
                     onClick={handleSubmit}
                     loading={loading}   
-                    disabled={loading}>
+                    disabled={loading}
+                    data-testid="submit-button">
                     Submit
                 </LoadingButton>
                 {loginError && (<div className="toast toast-error">
