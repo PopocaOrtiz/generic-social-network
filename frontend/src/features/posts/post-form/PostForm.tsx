@@ -1,8 +1,9 @@
 import React, { FC, FormEvent, useEffect, useRef, useState } from 'react';
 
+import { Typography } from '@mui/material';
+
 import { createPost } from '../api';
 import { IPost } from '../types';
-
 import Loading from '../../../components/Loading';
 import FormGroup from '../../../components/FormGroup';
 
@@ -62,7 +63,7 @@ const PostForm: FC<Props> = ({ onPostCreated }) => {
     const contentPlaceHolder = messages[Math.floor(Math.random() * messages.length)];
 
     return <>
-        <h3>New post</h3>
+        <Typography variant="h5">New post</Typography>
         <form onSubmit={submitHandler} data-testid='post-form'>
             <FormGroup>
                 <label htmlFor="content">Conent</label>

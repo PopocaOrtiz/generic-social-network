@@ -1,10 +1,11 @@
-import React, { useEffect, useState, FC } from 'react';
+import { useEffect, useState, FC, useCallback } from 'react';
+
+import { Fab, LinearProgress, Typography, TextField, Autocomplete, Alert } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 
 import { IPost } from './types';
 import { fetchPosts } from './api';
 import Post from './post/Post';
-import Search from './../../components/Search';
-import Loading from './../../components/Loading'
 import PostForm from './post-form/PostForm';
 
 const Posts: FC = () => {
@@ -13,13 +14,17 @@ const Posts: FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [showPostForm, setShowPostForm] = useState<boolean>(false);
     const [suggestions, setSuggestions] = useState<Array<string>>([]);
+    const [error, setError] = useState<string>();
 
-    async function getPosts (){
+    const [searchQuery, setSearchQuery] = useState<string>('');
+
+    const getPosts = useCallback(async (query?: string) => {
 
         setLoading(true);
+        setError('');
 
         try {
-            const response = await fetchPosts();
+            const response = await fetchPosts(query);
 
             if (!response.ok) {
                 throw Error('error fetching posts');
@@ -29,12 +34,11 @@ const Posts: FC = () => {
     
             setPosts(responseData);   
         } catch (error) {
-            // throw (error);
-            console.log('error fetching posts', error);
+            setError('error fetching posts');
         } finally {
             setLoading(false);
         }
-    }
+    }, []);
 
     useEffect(() => {
         getPosts();
@@ -45,21 +49,31 @@ const Posts: FC = () => {
         setShowPostForm(false);
     }
 
-    const changedQuery = (query: string) => {
-        console.log('searching for', query);
-        setSuggestions(current => [...current, query]);
+    const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(event.target.value);
+        getPosts(event.target.value.trim());
     }
 
     return (<>
-        <h1>Posts</h1>
-        <Search onChangeQuery={changedQuery} suggestions={suggestions}>
-            {!showPostForm && <button onClick={() => setShowPostForm(true)} className="btn input-group-btn">
-                <i className="icon icon-plus mr-2"></i>
-                New post
-            </button>}
-        </Search>
+        <Typography variant="h4">Posts</Typography>
+        <Fab aria-label="add-post" 
+            color="primary"
+            sx={{ position: 'absolute', bottom: 16, right: 16 }}
+            onClick={() => setShowPostForm(true)}>
+            <AddIcon />
+        </Fab>
+        <TextField label="search posts"
+            placeholder="search by content, author, etc.."
+            fullWidth
+            value={searchQuery}
+            onChange={onChangeHandler}
+            variant="standard"
+            margin="normal"
+            inputProps={{ "data-testid": "search-posts-input" }}
+            />
         <br />
-        <Loading show={loading} testid="loading-search-posts"/>
+        {loading && <LinearProgress />}
+        {error && <Alert severity="error">{error}</Alert>}
         {showPostForm && (<>
             <div className="card">
                 <div className="card-body">

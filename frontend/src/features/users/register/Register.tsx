@@ -1,6 +1,8 @@
 import React, { useRef, FC, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Button } from '@mui/material';
+
 import { IUserCreate } from '../types';
 import { registerUser } from '../api';
 import Loading from '../../../components/Loading';
@@ -109,7 +111,9 @@ const Register: FC = () => {
             </FormGroup>
             <br />
             <FormGroup>
-                <input type="submit" disabled={loading} className="float-right"/>
+                <Button disabled={loading} type='submit' data-testid="submit-button">
+                    Submit
+                </Button>
                 <Loading show={loading}/>
             </FormGroup>
         </form>
